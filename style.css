@@ -175,8 +175,8 @@ p {
   display: grid;
   gap: 20px;
   align-self: start;
-  position: sticky;
-  top: 20px;
+  position: relative;
+  top: auto;
 }
 
 .brand-card,
