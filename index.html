@@ -10,23 +10,22 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-shell">
+  <div class="page-glow glow-1"></div>
+  <div class="page-glow glow-2"></div>
+
+  <div class="app">
     <aside class="sidebar">
-      <div class="brand-block">
-        <span class="eyebrow">QuoteCraft</span>
-        <h1>Quote calculator for real client work</h1>
+      <div class="brand-card">
+        <div class="brand-badge">QuoteCraft</div>
+        <h1>Premium project quotes without any backend.</h1>
         <p>
-          Fast project pricing with presets, local saves, editable rates, and export-ready summary text.
+          Estimate client work with polished pricing presets, local saves, and a clean export-ready summary.
         </p>
       </div>
 
-      <div class="sidebar-card">
-        <div class="section-head">
-          <span class="eyebrow">Presets</span>
-          <h2>Start fast</h2>
-        </div>
-
-        <div class="preset-grid">
+      <div class="sidebar-panel">
+        <div class="panel-label">Project presets</div>
+        <div class="preset-list">
           <button class="preset-btn" data-preset="landing">Simple landing page</button>
           <button class="preset-btn" data-preset="saas">MVP SaaS</button>
           <button class="preset-btn" data-preset="portal">Client portal</button>
@@ -34,65 +33,66 @@
         </div>
       </div>
 
-      <div class="sidebar-card">
-        <div class="section-head">
-          <span class="eyebrow">Local storage</span>
-          <h2>Saved quotes</h2>
-        </div>
+      <div class="sidebar-panel">
+        <div class="panel-label">Saved locally</div>
         <div id="savedProjects" class="saved-projects"></div>
       </div>
     </aside>
 
     <main class="main">
-      <header class="topbar">
-        <div>
-          <span class="eyebrow">Offline tool</span>
-          <h2>Professional quote builder</h2>
-          <p>No APIs, no backend, and GitHub-safe static files only.</p>
+      <header class="hero">
+        <div class="hero-copy">
+          <div class="hero-pill">Offline static app</div>
+          <h2>Client-ready pricing in a Stripe-style layout</h2>
+          <p>
+            Clean visual hierarchy, instant quote updates, and GitHub-safe static files only.
+          </p>
         </div>
 
-        <div class="topbar-actions">
-          <button id="themeToggle" class="btn btn-ghost" type="button">Theme</button>
-          <button id="saveBtn" class="btn btn-secondary" type="button">Save project</button>
+        <div class="hero-actions">
+          <button id="themeToggle" class="btn btn-light" type="button">Theme</button>
+          <button id="saveBtn" class="btn btn-muted" type="button">Save project</button>
           <button id="printBtn" class="btn btn-primary" type="button">Print / Save PDF</button>
         </div>
       </header>
 
-      <section class="stats-grid">
-        <div class="stat-card">
-          <span>Hourly rate</span>
+      <section class="metric-row">
+        <article class="metric-card">
+          <span>Recommended rate</span>
           <strong id="kpiRate">€55/hr</strong>
-        </div>
-        <div class="stat-card">
-          <span>Total hours</span>
+        </article>
+        <article class="metric-card">
+          <span>Estimated hours</span>
           <strong id="kpiHours">29h</strong>
-        </div>
-        <div class="stat-card">
+        </article>
+        <article class="metric-card">
           <span>Timeline factor</span>
           <strong id="kpiRush">1.0x</strong>
-        </div>
-        <div class="stat-card">
+        </article>
+        <article class="metric-card metric-accent">
           <span>Total quote</span>
           <strong id="kpiTotal">€1,595</strong>
-        </div>
+        </article>
       </section>
 
-      <section class="content-grid">
-        <section class="panel form-panel">
-          <div class="section-head">
-            <span class="eyebrow">Inputs</span>
-            <h3>Project details</h3>
+      <section class="workspace">
+        <section class="form-shell">
+          <div class="section-top">
+            <div>
+              <div class="section-kicker">Inputs</div>
+              <h3>Project details</h3>
+            </div>
           </div>
 
           <div class="form-grid">
             <label>
               <span>Project name</span>
-              <input id="projectName" type="text" value="New website build">
+              <input id="projectName" type="text" value="New website build" />
             </label>
 
             <label>
               <span>Client name</span>
-              <input id="clientName" type="text" value="Acme Studio">
+              <input id="clientName" type="text" value="Acme Studio" />
             </label>
 
             <label>
@@ -109,7 +109,7 @@
 
             <label>
               <span>Hourly rate</span>
-              <input id="hourlyRate" type="number" min="1" step="1" value="55">
+              <input id="hourlyRate" type="number" min="1" step="1" value="55" />
             </label>
 
             <label>
@@ -125,7 +125,7 @@
 
             <label>
               <span>Pages / screens</span>
-              <input id="pages" type="number" min="1" step="1" value="5">
+              <input id="pages" type="number" min="1" step="1" value="5" />
             </label>
 
             <label>
@@ -140,7 +140,7 @@
 
             <label>
               <span>Revision rounds</span>
-              <input id="revisions" type="number" min="0" step="1" value="2">
+              <input id="revisions" type="number" min="0" step="1" value="2" />
             </label>
 
             <label>
@@ -155,65 +155,69 @@
 
             <label>
               <span>Discovery hours</span>
-              <input id="discoveryHours" type="number" min="0" step="1" value="3">
+              <input id="discoveryHours" type="number" min="0" step="1" value="3" />
             </label>
 
             <label>
               <span>Design hours</span>
-              <input id="designHours" type="number" min="0" step="1" value="8">
+              <input id="designHours" type="number" min="0" step="1" value="8" />
             </label>
 
             <label>
               <span>Development hours</span>
-              <input id="devHours" type="number" min="0" step="1" value="12">
+              <input id="devHours" type="number" min="0" step="1" value="12" />
             </label>
 
             <label>
               <span>Project management hours</span>
-              <input id="pmHours" type="number" min="0" step="1" value="2">
+              <input id="pmHours" type="number" min="0" step="1" value="2" />
             </label>
 
-            <label class="full-width">
+            <label class="full">
               <span>Scope notes</span>
               <textarea id="scopeNotes">Responsive build, quote-ready summary, launch-ready polish, and no external APIs.</textarea>
             </label>
           </div>
         </section>
 
-        <aside class="summary-column">
-          <section class="panel summary-hero">
-            <span class="eyebrow">Quote summary</span>
-            <div id="totalQuote" class="total-quote">€1,595</div>
-            <p id="summaryMeta">29 hours at €55/hr</p>
+        <aside class="summary-shell">
+          <div class="summary-card">
+            <div class="section-kicker">Quote summary</div>
+            <div id="totalQuote" class="quote-total">€1,595</div>
+            <p id="summaryMeta" class="summary-meta">29 hours at €55/hr</p>
 
-            <div class="summary-split">
-              <div class="summary-mini">
+            <div class="summary-breakdown">
+              <div>
                 <span>Deposit</span>
                 <strong id="depositQuote">€638</strong>
               </div>
-              <div class="summary-mini">
+              <div>
                 <span>Balance</span>
                 <strong id="balanceQuote">€957</strong>
               </div>
             </div>
-          </section>
+          </div>
 
-          <section class="panel">
-            <div class="section-head">
-              <span class="eyebrow">Breakdown</span>
-              <h3>Line items</h3>
+          <div class="summary-card">
+            <div class="section-top compact">
+              <div>
+                <div class="section-kicker">Cost structure</div>
+                <h3>Line items</h3>
+              </div>
             </div>
             <div id="lineItems" class="line-items"></div>
-          </section>
+          </div>
 
-          <section class="panel">
-            <div class="section-head">
-              <span class="eyebrow">Export text</span>
-              <h3>Client-ready summary</h3>
+          <div class="summary-card">
+            <div class="section-top compact">
+              <div>
+                <div class="section-kicker">Export text</div>
+                <h3>Client-ready summary</h3>
+              </div>
             </div>
             <textarea id="quoteText" class="quote-output" readonly></textarea>
-            <button id="copyBtn" class="btn btn-secondary" type="button">Copy summary</button>
-          </section>
+            <button id="copyBtn" class="btn btn-muted" type="button">Copy summary</button>
+          </div>
         </aside>
       </section>
     </main>
