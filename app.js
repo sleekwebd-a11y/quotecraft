@@ -136,49 +136,19 @@ function calculateQuote() {
 
   return {
     rate,
-    pages,
-    complexity,
-    rush,
     totalHours,
     total,
+    rush,
     deposit: total * 0.4,
     balance: total * 0.6,
     items: [
-      {
-        label: "Discovery and planning",
-        detail: `${discovery}h`,
-        value: discovery * rate * rush
-      },
-      {
-        label: "Design",
-        detail: `${design}h`,
-        value: design * rate * rush
-      },
-      {
-        label: "Development",
-        detail: `${development}h`,
-        value: development * rate * rush
-      },
-      {
-        label: "Page / screen structure",
-        detail: `${pages} × 1.5h`,
-        value: pageStructureHours * rate * rush
-      },
-      {
-        label: "Revision rounds",
-        detail: `${revisions} × 1.5h`,
-        value: revisionHours * rate * rush
-      },
-      {
-        label: "Project management",
-        detail: `${pm}h`,
-        value: pm * rate * rush
-      },
-      {
-        label: "Complexity adjustment",
-        detail: `× ${complexity.toFixed(2)}`,
-        value: (baseHours * rate * rush * complexity) - (baseHours * rate * rush)
-      }
+      { label: "Discovery and planning", detail: `${discovery}h`, value: discovery * rate * rush },
+      { label: "Design", detail: `${design}h`, value: design * rate * rush },
+      { label: "Development", detail: `${development}h`, value: development * rate * rush },
+      { label: "Page / screen structure", detail: `${pages} × 1.5h`, value: pageStructureHours * rate * rush },
+      { label: "Revision rounds", detail: `${revisions} × 1.5h`, value: revisionHours * rate * rush },
+      { label: "Project management", detail: `${pm}h`, value: pm * rate * rush },
+      { label: "Complexity adjustment", detail: `× ${complexity.toFixed(2)}`, value: (baseHours * rate * rush * complexity) - (baseHours * rate * rush) }
     ]
   };
 }
@@ -285,15 +255,15 @@ function copySummary() {
 }
 
 function toggleTheme() {
-  document.body.classList.toggle("light");
-  const theme = document.body.classList.contains("light") ? "light" : "dark";
-  localStorage.setItem(themeKey, theme);
+  document.body.classList.toggle("dark");
+  const current = document.body.classList.contains("dark") ? "dark" : "light";
+  localStorage.setItem(themeKey, current);
 }
 
 function restoreTheme() {
-  const savedTheme = localStorage.getItem(themeKey);
-  if (savedTheme === "light") {
-    document.body.classList.add("light");
+  const saved = localStorage.getItem(themeKey);
+  if (saved === "dark") {
+    document.body.classList.add("dark");
   }
 }
 
@@ -307,7 +277,6 @@ Object.values(fields).forEach(field => {
 });
 
 fields.ratePreset.addEventListener("change", applyRatePreset);
-
 document.getElementById("saveBtn").addEventListener("click", saveProject);
 document.getElementById("copyBtn").addEventListener("click", copySummary);
 document.getElementById("printBtn").addEventListener("click", () => window.print());
@@ -316,7 +285,6 @@ document.getElementById("themeToggle").addEventListener("click", toggleTheme);
 ui.savedProjects.addEventListener("click", (e) => {
   const loadId = e.target.getAttribute("data-load");
   const deleteId = e.target.getAttribute("data-delete");
-
   if (loadId) loadProject(loadId);
   if (deleteId) deleteProject(deleteId);
 });
