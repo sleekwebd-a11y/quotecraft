@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuoteCraft v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <style>
+    :root,[data-theme="light"]{
+      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
+      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+      --text-base:clamp(1rem,.95rem + .25vw,1.125rem);
+      --text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);
+      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;
+      --color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;--color-surface-offset:#f3f0ec;--color-border:#d4d1ca;--color-divider:#dcd9d5;
+      --color-text:#28251d;--color-text-muted:#67655f;--color-text-faint:#999791;--color-text-inverse:#f9f8f4;
+      --color-primary:#01696f;--color-primary-hover:#0c4e54;--color-primary-highlight:#d7e4e2;--color-success:#437a22;--color-warning:#da7101;
+      --shadow-sm:0 1px 2px oklch(0.2 0.01 80 / 0.06);--shadow-md:0 8px 24px oklch(0.2 0.01 80 / 0.09);
+      --radius-sm:.5rem;--radius-md:.85rem;--radius-lg:1.15rem;--radius-full:999px;--transition:180ms cubic-bezier(.16,1,.3,1);
+      --font-body:'Inter',system-ui,sans-serif;--font-display:'Instrument Serif',Georgia,serif;
+    }
+    [data-theme="dark"]{
+      --color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;--color-surface-offset:#262420;--color-border:#393836;--color-divider:#2a2927;
+      --color-text:#ece9e2;--color-text-muted:#aba7a0;--color-text-faint:#7f7a73;--color-text-inverse:#221f1a;
+      --color-primary:#5ea9ad;--color-primary-hover:#7fc0c3;--color-primary-highlight:#263537;--color-success:#8dbb63;--color-warning:#f0a74c;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.25);--shadow-md:0 16px 40px rgba(0,0,0,.28);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+    body{margin:0;min-height:100dvh;background:radial-gradient(circle at top right,color-mix(in oklab,var(--color-primary) 12%,transparent),transparent 25%),var(--color-bg);color:var(--color-text);font:400 var(--text-base)/1.5 var(--font-body)}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button{cursor:pointer}
+    .app{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:100dvh}
+    .sidebar{padding:var(--space-6);background:color-mix(in oklab,var(--color-surface) 88%,var(--color-primary) 12%);border-right:1px solid color-mix(in oklab,var(--color-text) 12%,transparent);display:flex;flex-direction:column;gap:var(--space-6);position:sticky;top:0;height:100dvh;overflow:auto}
+    .brand{display:flex;align-items:center;gap:var(--space-3)}
+    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,var(--color-primary),color-mix(in oklab,var(--color-primary) 52%,black));display:grid;place-items:center;color:white;box-shadow:var(--shadow-md)}
+    .brand h1{font-size:var(--text-xl);line-height:1;font-family:var(--font-display);font-weight:400;margin:0}
+    .muted{color:var(--color-text-muted)}
+    .sidebar-card,.panel,.summary-card,.line-item{background:var(--color-surface);border:1px solid color-mix(in oklab,var(--color-text) 10%,transparent);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+    .sidebar-card{padding:var(--space-4)}
+    .stack{display:grid;gap:var(--space-4)}
+    .main{padding:var(--space-6);display:grid;gap:var(--space-6)}
+    .topbar{display:flex;justify-content:space-between;gap:var(--space-4);align-items:center;flex-wrap:wrap}
+    .title h2{margin:0;font-size:var(--text-xl);line-height:1.1}
+    .title p{margin:.4rem 0 0;color:var(--color-text-muted)}
+    .actions{display:flex;gap:var(--space-3);flex-wrap:wrap}
+    .btn{min-height:46px;padding:.8rem 1rem;border-radius:var(--radius-full);border:1px solid color-mix(in oklab,var(--color-text) 10%,transparent);background:var(--color-surface-2);transition:all var(--transition);font-weight:600}
+    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+    .btn-primary{background:var(--color-primary);color:var(--color-text-inverse);border-color:transparent}
+    .btn-primary:hover{background:var(--color-primary-hover)}
+    .btn-ghost{background:transparent}
+    .section-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--space-6)}
+    .panel{padding:var(--space-5)}
+    .panel h3{margin:0 0 var(--space-4);font-size:var(--text-lg)}
+    .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4)}
+    .field{display:grid;gap:.5rem}
+    .field label{font-size:var(--text-sm);font-weight:600}
+    .field input,.field select,.field textarea{width:100%;border-radius:var(--radius-md);border:1px solid var(--color-border);background:var(--color-surface-2);padding:.9rem 1rem;outline:none}
+    .field textarea{min-height:110px;resize:vertical}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--color-primary);box-shadow:0 0 0 4px color-mix(in oklab,var(--color-primary) 18%,transparent)}
+    .presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3)}
+    .preset{padding:1rem;border-radius:var(--radius-md);text-align:left;border:1px solid color-mix(in oklab,var(--color-text) 10%,transparent);background:var(--color-surface-2)}
+    .preset strong{display:block;margin-bottom:.25rem}
+    .summary{display:grid;gap:var(--space-4)}
+    .summary-card{padding:var(--space-5)}
+    .summary-hero{display:grid;gap:var(--space-3)}
+    .pill{display:inline-flex;align-items:center;gap:.45rem;padding:.4rem .75rem;border-radius:var(--radius-full);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;background:var(--color-primary-highlight);color:var(--color-primary);font-weight:700;width:max-content}
+    .price{font-size:clamp(2.3rem,2rem + 2vw,4rem);line-height:1;font-weight:800;letter-spacing:-.04em}
+    .subprice{display:flex;justify-content:space-between;gap:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-divider);color:var(--color-text-muted)}
+    .line-items{display:grid;gap:var(--space-3)}
+    .line-item{padding:var(--space-4);display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start}
+    .line-item strong{display:block}
+    .tiny{font-size:var(--text-xs);color:var(--color-text-muted)}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-4)}
+    .kpi{padding:var(--space-4);border-radius:var(--radius-md);background:var(--color-surface);border:1px solid color-mix(in oklab,var(--color-text) 10%,transparent)}
+    .kpi span{display:block;color:var(--color-text-muted);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem}
+    .kpi strong{font-size:var(--text-lg)}
+    .saved-list{display:grid;gap:var(--space-3);max-height:300px;overflow:auto}
+    .saved-project{padding:var(--space-3);border-radius:var(--radius-md);background:var(--color-surface-2);border:1px solid color-mix(in oklab,var(--color-text) 9%,transparent);display:grid;gap:.5rem}
+    .saved-project header{display:flex;justify-content:space-between;gap:var(--space-2);align-items:center}
+    .saved-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+    .saved-actions button{padding:.5rem .75rem;min-height:auto;font-size:var(--text-xs)}
+    .footer-note{color:var(--color-text-faint);font-size:var(--text-xs)}
+    .inline{display:flex;gap:var(--space-3);flex-wrap:wrap}
+    .toggle{width:48px;height:48px;border-radius:999px;display:grid;place-items:center}
+    .success{color:var(--color-success)}
+    @media (max-width: 1100px){.section-grid,.app{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid color-mix(in oklab,var(--color-text) 12%,transparent)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width: 720px){.fields,.presets,.kpis{grid-template-columns:1fr}.main,.sidebar{padding:var(--space-4)}.price{font-size:2.7rem}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-label="QuoteCraft logo">
+            <path d="M4 18L12 5l8 13"></path>
+            <path d="M8.8 18h6.4"></path>
+            <path d="M10.2 13.6h3.6"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>QuoteCraft</h1>
+          <div class="muted">No-API quoting studio</div>
+        </div>
+      </div>
+
+      <div class="sidebar-card stack">
+        <div>
+          <div class="pill">Rate bands</div>
+          <p class="muted">Preset hourly ranges based on Estonia, wider EU, US, freelancer, and agency pricing context.</p>
+        </div>
+        <div class="tiny">Estonia minimum wage was reported at €946/month and €5.67/hour from April 2026, while broader contractor guides put Eastern Europe around €25–€60/hr, Western Europe around €50–€120/hr, and US developer work often around $40–$160+/hr depending on seniority.[web:182][web:186][web:187]</div>
+      </div>
+
+      <div class="sidebar-card stack">
+        <strong>Saved locally</strong>
+        <div id="savedProjects" class="saved-list"></div>
+        <div class="footer-note">Uses browser localStorage only. No backend, no APIs.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <h2>Project quote calculator v2</h2>
+          <p>Presets, line items, local saves, PDF export, and regional rate profiles.</p>
+        </div>
+        <div class="actions">
+          <button class="btn toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+          <button class="btn" id="saveProjectBtn">Save project</button>
+          <button class="btn btn-primary" id="exportPdfBtn">Export PDF</button>
+        </div>
+      </div>
+
+      <section class="kpis">
+        <div class="kpi"><span>Recommended rate</span><strong id="kpiRate">€65/hr</strong></div>
+        <div class="kpi"><span>Estimated hours</span><strong id="kpiHours">24h</strong></div>
+        <div class="kpi"><span>Rush factor</span><strong id="kpiRush">1.0x</strong></div>
+        <div class="kpi"><span>Total quote</span><strong id="kpiTotal">€1,560</strong></div>
+      </section>
+
+      <div class="section-grid">
+        <section class="panel stack">
+          <div>
+            <h3>Project setup</h3>
+            <p class="muted">Use a starting preset, then adjust complexity, pages, revisions, and delivery urgency.</p>
+          </div>
+
+          <div class="presets">
+            <button class="preset" data-project-preset="simple-landing"><strong>Simple landing page</strong><span class="muted">Fast brochure site or promo page.</span></button>
+            <button class="preset" data-project-preset="mvp-saas"><strong>MVP SaaS</strong><span class="muted">Core app screens, auth-like flows, dashboard feel.</span></button>
+            <button class="preset" data-project-preset="client-portal"><strong>Client portal</strong><span class="muted">Logged-in area, documents, messaging, account sections.</span></button>
+            <button class="preset" data-project-preset="custom"><strong>Blank custom</strong><span class="muted">Start clean and tune everything manually.</span></button>
+          </div>
+
+          <div class="fields">
+            <div class="field"><label for="projectName">Project name</label><input id="projectName" value="New client website"></div>
+            <div class="field"><label for="clientName">Client</label><input id="clientName" value="Acme Studio"></div>
+            <div class="field"><label for="marketPreset">Hourly market preset</label>
+              <select id="marketPreset">
+                <option value="estonia">Estonia freelancer</option>
+                <option value="eu">EU freelancer</option>
+                <option value="us">US freelancer</option>
+                <option value="freelancer">Global freelancer</option>
+                <option value="agency">Agency band</option>
+                <option value="custom">Custom manual rate</option>
+              </select>
+            </div>
+            <div class="field"><label for="hourlyRate">Hourly rate</label><input id="hourlyRate" type="number" min="1" step="1" value="65"></div>
+            <div class="field"><label for="projectType">Project type</label>
+              <select id="projectType">
+                <option value="landing">Landing page</option>
+                <option value="saas">MVP SaaS</option>
+                <option value="portal">Client portal</option>
+                <option value="ecommerce">E-commerce</option>
+                <option value="dashboard">Dashboard</option>
+              </select>
+            </div>
+            <div class="field"><label for="pages">Pages / major screens</label><input id="pages" type="number" min="1" step="1" value="5"></div>
+            <div class="field"><label for="complexity">Complexity</label>
+              <select id="complexity">
+                <option value="1">Simple</option>
+                <option value="1.35" selected>Standard</option>
+                <option value="1.75">Advanced</option>
+                <option value="2.2">Complex</option>
+              </select>
+            </div>
+            <div class="field"><label for="revisions">Revision rounds</label><input id="revisions" type="number" min="0" step="1" value="2"></div>
+            <div class="field"><label for="rush">Rush multiplier</label>
+              <select id="rush">
+                <option value="1">Normal timeline</option>
+                <option value="1.15">Fast turnaround</option>
+                <option value="1.3">Rush</option>
+                <option value="1.5">Emergency</option>
+              </select>
+            </div>
+            <div class="field"><label for="discoveryHours">Discovery hours</label><input id="discoveryHours" type="number" min="0" step="1" value="3"></div>
+            <div class="field"><label for="designHours">Design/UI hours</label><input id="designHours" type="number" min="0" step="1" value="8"></div>
+            <div class="field"><label for="devHours">Development base hours</label><input id="devHours" type="number" min="0" step="1" value="12"></div>
+            <div class="field"><label for="pmHours">PM / communication hours</label><input id="pmHours" type="number" min="0" step="1" value="2"></div>
+            <div class="field" style="grid-column:1 / -1"><label for="notes">Scope notes</label><textarea id="notes">Responsive build, quote summary, launch-ready polish, no external APIs.</textarea></div>
+          </div>
+        </section>
+
+        <aside class="summary">
+          <div class="summary-card summary-hero">
+            <div class="pill">Quote summary</div>
+            <div class="price" id="totalPrice">€1,560</div>
+            <div class="muted" id="summaryLabel">24 hours at €65/hr</div>
+            <div class="subprice"><span>Deposit (40%)</span><strong id="depositPrice">€624</strong></div>
+            <div class="subprice"><span>Delivery balance</span><strong id="balancePrice">€936</strong></div>
+          </div>
+
+          <div class="summary-card">
+            <h3>Line items</h3>
+            <div id="lineItems" class="line-items"></div>
+          </div>
+
+          <div class="summary-card stack">
+            <h3>Exportable wording</h3>
+            <p id="quoteSummaryText" class="muted"></p>
+            <div class="inline">
+              <button class="btn" id="copySummaryBtn">Copy summary</button>
+              <span id="copyState" class="tiny success"></span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const inputs = {
+      projectName: $('projectName'), clientName: $('clientName'), marketPreset: $('marketPreset'), hourlyRate: $('hourlyRate'), projectType: $('projectType'), pages: $('pages'), complexity: $('complexity'), revisions: $('revisions'), rush: $('rush'), discoveryHours: $('discoveryHours'), designHours: $('designHours'), devHours: $('devHours'), pmHours: $('pmHours'), notes: $('notes')
+    };
+
+    const marketRates = {
+      estonia: { label: 'Estonia freelancer', rate: 45 },
+      eu: { label: 'EU freelancer', rate: 80 },
+      us: { label: 'US freelancer', rate: 120 },
+      freelancer: { label: 'Global freelancer', rate: 65 },
+      agency: { label: 'Agency band', rate: 110 },
+      custom: { label: 'Custom', rate: null }
+    };
+
+    const presets = {
+      'simple-landing': { projectType:'landing', pages:1, complexity:'1', revisions:2, discoveryHours:2, designHours:4, devHours:8, pmHours:2, notes:'Single landing page with CTA, responsive polish, contact section, and deployment-ready handoff.' },
+      'mvp-saas': { projectType:'saas', pages:7, complexity:'1.75', revisions:3, discoveryHours:5, designHours:14, devHours:28, pmHours:6, notes:'Core MVP SaaS UI with app shell, dashboard screens, settings, and polished product interactions.' },
+      'client-portal': { projectType:'portal', pages:6, complexity:'1.9', revisions:3, discoveryHours:4, designHours:12, devHours:24, pmHours:5, notes:'Client portal with account area, documents, dashboard sections, activity views, and admin-ready layout.' },
+      'custom': { projectType:'landing', pages:5, complexity:'1.35', revisions:2, discoveryHours:3, designHours:8, devHours:12, pmHours:2, notes:'Custom scoped project with responsive front-end build and launch-ready delivery.' }
+    };
+
+    function money(value, currency='€') {
+      return new Intl.NumberFormat('en-EE', { maximumFractionDigits: 0 }).format(Math.round(value)).replace(/,/g, ' ') + currency;
+    }
+
+    function serializeForm() {
+      return Object.fromEntries(Object.entries(inputs).map(([key, el]) => [key, el.value]));
+    }
+
+    function applyMarketPreset() {
+      const preset = marketRates[inputs.marketPreset.value];
+      if (preset && preset.rate) inputs.hourlyRate.value = preset.rate;
+      updateQuote();
+    }
+
+    function applyProjectPreset(name) {
+      const preset = presets[name];
+      if (!preset) return;
+      Object.entries(preset).forEach(([key, value]) => { if (inputs[key]) inputs[key].value = value; });
+      updateQuote();
+    }
+
+    function calcQuote() {
+      const rate = Number(inputs.hourlyRate.value || 0);
+      const pages = Number(inputs.pages.value || 0);
+      const complexity = Number(inputs.complexity.value || 1);
+      const revisions = Number(inputs.revisions.value || 0);
+      const rush = Number(inputs.rush.value || 1);
+      const discovery = Number(inputs.discoveryHours.value || 0);
+      const design = Number(inputs.designHours.value || 0);
+      const dev = Number(inputs.devHours.value || 0);
+      const pm = Number(inputs.pmHours.value || 0);
+
+      const structureHours = pages * 1.5;
+      const revisionHours = revisions * 1.5;
+      const subtotalHours = discovery + design + dev + pm + structureHours + revisionHours;
+      const totalHours = subtotalHours * complexity;
+      const total = totalHours * rate * rush;
+
+      return {
+        rate, pages, complexity, revisions, rush,
+        structureHours, revisionHours, subtotalHours, totalHours, total,
+        deposit: total * 0.4,
+        balance: total * 0.6,
+        items: [
+          { label:'Discovery & planning', detail:`${discovery}h`, value: discovery * rate * rush },
+          { label:'UI/UX design', detail:`${design}h`, value: design * rate * rush },
+          { label:'Development base', detail:`${dev}h`, value: dev * rate * rush },
+          { label:'Page / screen structure', detail:`${pages} × 1.5h`, value: structureHours * rate * rush },
+          { label:'Revision rounds', detail:`${revisions} × 1.5h`, value: revisionHours * rate * rush },
+          { label:'PM & communication', detail:`${pm}h`, value: pm * rate * rush },
+          { label:'Complexity multiplier', detail:`× ${complexity.toFixed(2)}`, value: (subtotalHours * rate * rush * complexity) - (subtotalHours * rate * rush) }
+        ]
+      };
+    }
+
+    function updateQuote() {
+      const quote = calcQuote();
+      $('totalPrice').textContent = money(quote.total);
+      $('depositPrice').textContent = money(quote.deposit);
+      $('balancePrice').textContent = money(quote.balance);
+      $('summaryLabel').textContent = `${Math.round(quote.totalHours)} hours at ${money(quote.rate, '/hr')}`;
+      $('kpiRate').textContent = money(quote.rate, '/hr');
+      $('kpiHours').textContent = `${Math.round(quote.totalHours)}h`;
+      $('kpiRush').textContent = `${quote.rush.toFixed(2)}x`;
+      $('kpiTotal').textContent = money(quote.total);
+
+      $('lineItems').innerHTML = quote.items.map(item => `
+        <div class="line-item">
+          <div><strong>${item.label}</strong><div class="tiny">${item.detail}</div></div>
+          <strong>${money(item.value)}</strong>
+        </div>
+      `).join('');
+
+      $('quoteSummaryText').textContent = `Quote for ${inputs.clientName.value} — ${inputs.projectName.value}. Estimated total: ${money(quote.total)} based on ${Math.round(quote.totalHours)} hours at ${money(quote.rate, '/hr')}, including ${inputs.revisions.value} revision rounds, ${inputs.pages.value} pages/screens, and a ${quote.rush.toFixed(2)}x timeline factor. Scope notes: ${inputs.notes.value}`;
+    }
+
+    function saveProject() {
+      const quote = calcQuote();
+      const record = { id: crypto.randomUUID(), savedAt: new Date().toISOString(), form: serializeForm(), quote: { total: quote.total, totalHours: quote.totalHours, rate: quote.rate } };
+      const existing = JSON.parse(localStorage.getItem('quotecraft-projects') || '[]');
+      existing.unshift(record);
+      localStorage.setItem('quotecraft-projects', JSON.stringify(existing.slice(0, 12)));
+      renderSavedProjects();
+    }
+
+    function renderSavedProjects() {
+      const list = JSON.parse(localStorage.getItem('quotecraft-projects') || '[]');
+      const root = $('savedProjects');
+      if (!list.length) {
+        root.innerHTML = '<div class="saved-project"><strong>No saved projects yet</strong><div class="tiny">Save a quote and it stays in this browser.</div></div>';
+        return;
+      }
+      root.innerHTML = list.map(item => `
+        <article class="saved-project">
+          <header>
+            <strong>${item.form.projectName}</strong>
+            <span class="tiny">${new Date(item.savedAt).toLocaleDateString('en-EE')}</span>
+          </header>
+          <div class="tiny">${item.form.clientName} · ${money(item.quote.total)} · ${Math.round(item.quote.totalHours)}h</div>
+          <div class="saved-actions">
+            <button class="btn" data-load="${item.id}">Load</button>
+            <button class="btn" data-delete="${item.id}">Delete</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function loadProject(id) {
+      const list = JSON.parse(localStorage.getItem('quotecraft-projects') || '[]');
+      const item = list.find(x => x.id === id);
+      if (!item) return;
+      Object.entries(item.form).forEach(([key, value]) => { if (inputs[key]) inputs[key].value = value; });
+      updateQuote();
+    }
+
+    function deleteProject(id) {
+      const list = JSON.parse(localStorage.getItem('quotecraft-projects') || '[]').filter(x => x.id !== id);
+      localStorage.setItem('quotecraft-projects', JSON.stringify(list));
+      renderSavedProjects();
+    }
+
+    async function copySummary() {
+      await navigator.clipboard.writeText($('quoteSummaryText').textContent);
+      $('copyState').textContent = 'Copied';
+      setTimeout(() => $('copyState').textContent = '', 1500);
+    }
+
+    function exportPdf() {
+      const quote = calcQuote();
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'a4' });
+      let y = 56;
+      const lines = [
+        ['QuoteCraft summary', 20, 'bold'],
+        [`Client: ${inputs.clientName.value}`, 12, 'normal'],
+        [`Project: ${inputs.projectName.value}`, 12, 'normal'],
+        [`Project type: ${inputs.projectType.options[inputs.projectType.selectedIndex].text}`, 12, 'normal'],
+        [`Rate preset: ${inputs.marketPreset.options[inputs.marketPreset.selectedIndex].text}`, 12, 'normal'],
+        [`Hourly rate: ${money(quote.rate, '/hr')}`, 12, 'normal'],
+        [`Estimated hours: ${Math.round(quote.totalHours)}h`, 12, 'normal'],
+        [`Total quote: ${money(quote.total)}`, 16, 'bold'],
+        [`Deposit (40%): ${money(quote.deposit)}`, 12, 'normal'],
+        [`Balance: ${money(quote.balance)}`, 12, 'normal'],
+        ['', 10, 'normal'],
+        ['Scope notes:', 12, 'bold'],
+        [inputs.notes.value, 11, 'normal'],
+        ['', 10, 'normal'],
+        ['Line items:', 12, 'bold']
+      ];
+      doc.setTextColor(28,27,25);
+      lines.forEach(([text,size,weight]) => {
+        doc.setFont('helvetica', weight);
+        doc.setFontSize(size);
+        const wrapped = doc.splitTextToSize(text, 480);
+        doc.text(wrapped, 56, y);
+        y += wrapped.length * (size + 4) + 8;
+      });
+      quote.items.forEach(item => {
+        const row = `${item.label} (${item.detail}) — ${money(item.value)}`;
+        const wrapped = doc.splitTextToSize(row, 480);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(11);
+        doc.text(wrapped, 56, y);
+        y += wrapped.length * 15 + 4;
+      });
+      doc.save(`${inputs.projectName.value.toLowerCase().replace(/[^a-z0-9]+/g,'-') || 'quote'}-summary.pdf`);
+    }
+
+    document.querySelectorAll('[data-project-preset]').forEach(btn => btn.addEventListener('click', () => applyProjectPreset(btn.dataset.projectPreset)));
+    Object.values(inputs).forEach(el => el.addEventListener('input', updateQuote));
+    inputs.marketPreset.addEventListener('change', applyMarketPreset);
+    $('saveProjectBtn').addEventListener('click', saveProject);
+    $('copySummaryBtn').addEventListener('click', copySummary);
+    $('exportPdfBtn').addEventListener('click', exportPdf);
+    $('savedProjects').addEventListener('click', (e) => {
+      const loadId = e.target.getAttribute('data-load');
+      const deleteId = e.target.getAttribute('data-delete');
+      if (loadId) loadProject(loadId);
+      if (deleteId) deleteProject(deleteId);
+    });
+
+    const themeToggle = $('themeToggle');
+    let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    themeToggle.addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    });
+
+    applyMarketPreset();
+    renderSavedProjects();
+    updateQuote();
+  </script>
+</body>
+</html>
